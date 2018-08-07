@@ -13,6 +13,7 @@ def get_monitor(top, left, width, height):
 grab_areas = {
     (2560, 1440): get_monitor(300, 943, 675, 200),
     (2048, 1152): get_monitor(300, 943, 675, 200),
+	(1536, 864): get_monitor(345, 575, 750, 200),
 }
 
 screen_w = GetSystemMetrics(0)
@@ -58,6 +59,42 @@ def compare_matches(x, y):
     print(x, y)
     return x[3][0] - y[3][0]
 
+ground = 38
+	
+def extract_features(matches):
+	len = np.shape(matches)
+	features = np.zeros(8)
+	if len == 0:
+		features[0] = 1
+		features[1] = 1
+		features[2] = 0
+		features[3] = 0
+		features[4] = 1
+		features[5] = 1
+		features[6] = 0
+		features[7] = 0
+	elif len == 1:
+		object = matches[0]
+		features[0] = object[3][0] / grab_areas.get((screen_w, screen_h))[2]
+		features[1] = (object[3][1] - ground) / 70
+		features[2] = object[1] / 100
+		features[3] = (object[3][1] - ground + object[1]) / (grab_areas.get((screen_w, screen_h))[3] * 2)
+		features[4] = 1
+		features[5] = 1
+		features[6] = 0
+		features[7] = 0
+	else:
+		object1 = matches[0]
+		object2 = matches[1]
+		features[0] = object1[3][0] / grab_areas.get((screen_w, screen_h))[2]
+		features[1] = (object1[3][1] - ground) / 70
+		features[2] = object1[1] / 100
+		features[3] = (object1[3][1] - ground + object1[1]) / (grab_areas.get((screen_w, screen_h))[3] * 2)
+		features[4] = object2[3][0] / grab_areas.get((screen_w, screen_h))[2]
+		features[5] = (object2[3][1] - ground) / 70
+		features[6] = object2[1] / 100
+		features[7] = (object2[3][1] - ground + object2[1]) / (grab_areas.get((screen_w, screen_h))[3] * 2)
+	return features
 
 def get_matches(screen):
     matches = []
