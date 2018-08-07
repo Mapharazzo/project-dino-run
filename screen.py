@@ -4,6 +4,7 @@ import glob
 from random import sample
 from mss import mss
 from win32api import GetSystemMetrics
+from functools import cmp_to_key
 
 
 def get_monitor(top, left, width, height):
@@ -53,6 +54,11 @@ for image in templates_files:
 threshold = 0.95
 
 
+def compare_matches(x, y):
+    print(x, y)
+    return x[3][0] - y[3][0]
+
+
 def get_matches(screen):
     matches = []
     screen_grey = cv2.cvtColor(screen, cv2.COLOR_RGB2GRAY)
@@ -62,8 +68,14 @@ def get_matches(screen):
 
         loc = np.where(res >= threshold)
         coordinates = list(zip(*loc[::-1]))
-        matches.append((temp_w, temp_h, idx, coordinates))
+        print(coordinates)
+        for pair in coordinates:
+            matches.append((temp_w, temp_h, idx, pair))
 
+    cmp_key = cmp_to_key(compare_matches)
+    if matches:
+        matches.sort(key=cmp_key)
+    print(matches)
     return matches
 
 
@@ -76,15 +88,8 @@ def draw_screen(screen, detection=False):
             temp_h = match[1]
             idx = match[2]
             coordinates = match[3]
-            if not coordinates:
-                continue
-            if len(coordinates) >= 5:
-                samples = sample(coordinates, 5)
-            else:
-                samples = coordinates
-            for match_point in samples:
-                cv2.rectangle(screen, match_point,
-                              (match_point[0] + temp_w, match_point[1] + temp_h), colors[idx], 2)
+            cv2.rectangle(screen, coordinates,
+                              (coordinates[0] + temp_w, coordinates[1] + temp_h), colors[idx], 2)
 
     cv2.imshow('Dino', screen)
     # SHOULD BE PAIRED WITH

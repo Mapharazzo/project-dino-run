@@ -5,6 +5,7 @@ import glob
 from pynput.keyboard import Key, Controller
 from mss import mss
 
+
 def is_similar(image1, image2):
     return image1.shape == image2.shape and not(np.bitwise_xor(image1,image2).any())
 
@@ -61,14 +62,14 @@ flag = False
 while True:
     # print(iter)
     iter += 1
-    if iter % 10 == 0 or flag:
-        iter = 1
-        keyboard.release(Key.down)
-        keyboard.press(Key.up)
-        keyboard.release(Key.up)
-        flag = False
-    else:
-        keyboard.press(Key.down)
+    # if iter % 10 == 0 or flag:
+    #     iter = 1
+    #     keyboard.release('w')
+    #     keyboard.press('s')
+    #     keyboard.release('s')
+    #     flag = False
+    # else:
+    #     keyboard.press('w')
     sct_img = np.array(sct.grab(monitor))
     sct_grey = cv2.cvtColor(sct_img, cv2.COLOR_BGR2GRAY)
 
